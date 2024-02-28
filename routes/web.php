@@ -28,7 +28,8 @@ Route::post('/logout',[\App\Http\Controllers\AuthController::class, 'logout'])->
 Route::resource('/produits', \App\Http\Controllers\ProduitController::class);
 Route::resource('/users', \App\Http\Controllers\UtilisateurController::class);
 Route::resource('/roles', \App\Http\Controllers\RoleController::class);
-Route::post('/panier.store', [\App\Http\Controllers\PanierController::class, 'store'])->name('panier.store');
+Route::resource('/clients', \App\Http\Controllers\ClientController::class );
+Route::resource('/commande', \App\Http\Controllers\CommandeController::class );
 
 
 

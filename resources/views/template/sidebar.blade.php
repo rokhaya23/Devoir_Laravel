@@ -12,7 +12,7 @@
                         </li>
                     @endcan
 
-                    @can('voir-produits')
+                    @can('manage-products')
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('produits.index') }}">
                                 <i class="bi bi-grid"></i>
@@ -21,46 +21,53 @@
                         </li>
                     @endcan
 
-                    @can('valider-commandes')
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('users.index') }}">
-                                <i class="bi bi-grid"></i>
-                                <span>Manage Orders</span>
-                            </a>
-                        </li>
-                    @endcan
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#submenu-orders">
+                            <i class="bi bi-grid"></i>
+                            <span>Orders</span>
+                        </a>
+                        <ul class="submenu-list collapse" id="submenu-orders">
+                            @can('manage-orders')
+                                <li><a href="{{ route('commande.index') }}">Manage Orders</a></li>
+                            @endcan
 
-                    @can('create-users')
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('users.index') }}">
-                                <i class="bi bi-grid"></i>
-                                <span>Create Users</span>
-                            </a>
-                        </li>
-                    @endcan
+                            @can('validate-orders')
+                                <li><a href="{{ route('users.index') }}">Validate Orders</a></li>
+                            @endcan
+                        </ul>
+                    </li>
 
-                        @can('create-roles')
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('roles.index') }}">
-                                    <i class="bi bi-grid"></i>
-                                    <span>Create Roles</span>
-                                </a>
-                            </li>
-                        @endcan
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="collapse" href="#submenu-page">
+                            <i class="bi bi-grid"></i>
+                            <span>Page</span>
+                        </a>
+                        <ul class="submenu-list collapse" id="submenu-page">
+                            @can('create-users')
+                                <li><a href="{{ route('users.index') }}">Create Users</a></li>
+                            @endcan
 
+                            @can('create-roles')
+                                <li><a href="{{ route('roles.index') }}">Create Roles</a></li>
+                            @endcan
 
-                    @else
-                        <!-- Handle the case when the user is not authenticated -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('users.index') }}">
-                                <i class="bi bi-grid"></i>
-                                <span>Accueil</span>
-                            </a>
-                        </li>
+                            @can('create-clients')
+                                <li><a href="{{ route('clients.index') }}">Create Clients</a></li>
+                            @endcan
+                        </ul>
+                    </li>
                 @endauth
             </ul>
         </aside>
     </div>
 </div>
 
+<script>
+    $(document).ready(function() {
+        $('.nav-link[data-bs-toggle="collapse"]').click(function() {
+            var target = $(this).attr("href");
+            $(target).toggleClass('show');
+        });
+    });
+</script>
 

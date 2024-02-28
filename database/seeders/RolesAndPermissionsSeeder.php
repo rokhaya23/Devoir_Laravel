@@ -21,11 +21,12 @@ class RolesAndPermissionsSeeder extends Seeder
  //creer des permissions
         $permissions = [
             'dashboard',
-            'gerer-produits',
-            'valider-commandes',
+            'manage-products',
+            'validate-orders',
             'create-users',
             'create-roles',
-            'accueil',
+            'create-clients',
+            'manage-orders',
         ];
 
         foreach ($permissions as $permission) {
@@ -34,24 +35,23 @@ class RolesAndPermissionsSeeder extends Seeder
 //creer des roles
 
         $admin = Role::create(['name' => 'Admin']);
-        $client = Role::create(['name' => 'Client']);
         $productManager = Role::create(['name' => 'Product Manager']);
 
         $productManager->givePermissionTo([
-            'gerer-produits',
-            'valider-commandes',
+            'manage-products',
+            'manage-orders',
+            'create-clients',
         ]);
 
-        $client->givePermissionTo([
-            'accueil'
-        ]);
 
         $admin->givePermissionTo([
             'dashboard',
-            'gerer-produits',
-            'valider-commandes',
+            'manage-products',
+            'manage-orders',
             'create-users',
             'create-roles',
+            'create-clients',
+            'validate-orders',
         ]);
 
 //creer des utilisateurs
@@ -63,7 +63,7 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
         $Admin->assignRole('Admin');
 
-        // Creating Admin User
+
         $Manager = Utilisateur::create([
             'nom' => 'Fall',
             'prenom' => 'Fallou',
@@ -72,14 +72,9 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
         $Manager->assignRole('Product Manager');
 
-        // Creating Product Manager User
-        $Client = Utilisateur::create([
-            'nom' => 'Ndiaye',
-            'prenom' => 'Fallou',
-            'email' => 'falloundiaye@gmail.com',
-            'password' => Hash::make('passer@3')
-        ]);
-        $Client->assignRole('Client');
+
+
+
 
 
         Categorie::create([

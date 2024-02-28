@@ -15,7 +15,7 @@ class ProduitController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('permission:gerer-produits', ['only' => ['index','show','creste','update','store','edit','destroy']]);
+        $this->middleware('permission:manage-products', ['only' => ['index','show','creste','update','store','edit','destroy']]);
 
     }
 
@@ -23,14 +23,14 @@ class ProduitController extends Controller
     {
 
         $produits = Produit::all();
-        return view('commande.details', compact('produits'));
+        return view('produit.details', compact('produits'));
     }
 
     public function create()
     {
         $produit = new Produit();// Créez une instance vide de Produit
         $categories = Categorie::all();
-        return view('commande.formulaire',compact('produit','categories'));
+        return view('produit.formulaire',compact('produit','categories'));
     }
 
     public function store(ProduitRequest $request)
@@ -65,7 +65,7 @@ class ProduitController extends Controller
         // Récupérez d'autres produits comme suggestions (exemple: les 4 derniers produits)
         $suggestedProducts = Produit::where('id', '!=', $produit->id)->latest()->take(4)->get();
 
-        return view('commande.show', compact('produit','suggestedProducts'));
+        return view('produit.show', compact('produit','suggestedProducts'));
     }
 
     /**
@@ -74,7 +74,7 @@ class ProduitController extends Controller
     public function edit(Produit $produit)
     {
         $categories = Categorie::all();
-        return view('commande.formulaire', compact('produit','categories'));
+        return view('produit.formulaire', compact('produit','categories'));
     }
 
     /**
