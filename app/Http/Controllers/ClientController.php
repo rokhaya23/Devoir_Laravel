@@ -10,7 +10,7 @@ class ClientController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('permission:create-clients', ['only' => ['index','show','create','update','store','edit','destroy']]);
+        $this->middleware('permission:create-clients', ['only' => ['index','create','update','store','edit','destroy']]);
 
     }
     /**
@@ -84,7 +84,7 @@ class ClientController extends Controller
         // Mise à jour du client
         $client->update($validatedData);
 
-        return redirect()->route('clients.update')->with('success', 'Client mis à jour avec succès.');
+        return redirect()->route('clients.index')->with('success', 'Client mis à jour avec succès.');
     }
 
     /**

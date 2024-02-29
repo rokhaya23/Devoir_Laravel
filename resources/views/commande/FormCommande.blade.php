@@ -14,11 +14,13 @@
                             <div class="row">
                                 <div class="col-sm-6 col-12">
                                     <div class="mb-3">
-                                        <label for="client" class="form-label">Client</label>
-                                        <select id="client" name="client_id" class="form-select">
+                                        <label for="client" class="form-label"></label>
+                                        <br>
+                                        <br>
+                                        <select id="client" name="idClient" class="form-select">
                                             <option value="" selected disabled>Sélectionnez le client</option>
                                             @foreach ($clients as $client)
-                                                <option value="{{ $client->id }}">{{ $client->nom }}</option>
+                                                <option value="{{ $client->id }}" data-adresse="{{ $client->adresse }}" data-telephone="{{ $client->telephone }}" data-sexe="{{ $client->sexe }}">{{ $client->nom }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -36,7 +38,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="date_commande" class="form-label">Date de la commande</label>
-                                        <input type="text" id="date_commande" name="date_commande" class="form-control datepicker-opens-left">
+                                        <input type="date" id="date_commande" name="date_commande" class="form-control datepicker-opens-left">
                                     </div>
                                 </div>
                             </div>
@@ -57,7 +59,7 @@
                                             <tbody class="products-container">
                                             <tr>
                                                 <td>
-                                                    <select class="form-select" name="produit_id[]">
+                                                    <select class="form-select" name="idProduct[]">
                                                         <option value="" selected disabled>Sélectionnez le produit</option>
                                                         @foreach ($produits as $produit)
                                                             <option value="{{ $produit->id }}" data-price="{{ $produit->prix }}" data-stock="{{ $produit->quantite_stock }}">{{ $produit->nom }}</option>
@@ -65,13 +67,13 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control" name="quantite[]" min="1" value="1">
+                                                    <input type="number" class="form-control" name="quantity[]" min="1" value="1">
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" name="prix_unitaire[]" readonly>
+                                                    <input type="text" class="form-control" name="prix[]" readonly>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" name="prix_total[]" readonly>
+                                                    <input type="text" class="form-control" name="total_amount[]" readonly>
                                                 </td>
                                                 <td>
                                                     <button type="button" class="btn btn-outline-danger remove-product">Supprimer</button>
@@ -112,7 +114,7 @@
             $('.datepicker-opens-left').datepicker({
                 autoclose: true,
                 todayHighlight: true,
-                format: 'dd/mm/yyyy',
+                format: 'yyyy-mm-dd', // Mettez à jour le format ici
             });
 
             // Mettre à jour les informations du client lorsque vous choisissez un client
@@ -124,32 +126,32 @@
             });
 
             // Mettre à jour le prix unitaire et le prix total lorsque vous choisissez un produit
-            $('.products-container').on('change', 'select[name="produit_id[]"]', function() {
+            $('.products-container').on('change', 'select[name="idProduct[]"]', function() {
                 var selectedProduit = $(this).find(':selected');
                 var price = selectedProduit.data('price');
                 var stock = selectedProduit.data('stock');
                 var row = $(this).closest('tr');
-                row.find('input[name="prix_unitaire[]"]').val(price.toFixed(2));
-                row.find('input[name="prix_total[]"]').val((price * row.find('input[name="quantite[]"]').val()).toFixed(2));
+                row.find('input[name="prix[]"]').val(price.toFixed(2));
+                row.find('input[name="total_amount[]"]').val((price * row.find('input[name="quantity[]"]').val()).toFixed(2));
 
                 // Mettre à jour le stock maximum autorisé
-                row.find('input[name="quantite[]"]').attr('max', stock);
+                row.find('input[name="quantity[]"]').attr('max', stock);
 
                 // Calculer le nouveau total
                 updateTotalAmount();
             });
 
             // Mettre à jour le prix total lorsqu'une quantité change
-            $('.products-container').on('input', 'input[name="quantite[]"]', function() {
+            $('.products-container').on('input', 'input[name="quantity[]"]', function() {
                 var row = $(this).closest('tr');
-                var price = row.find('select[name="produit_id[]"]').find(':selected').data('price');
-                var stock = row.find('select[name="produit_id[]"]').find(':selected').data('stock');
+                var price = row.find('select[name="idProduct[]"]').find(':selected').data('price');
+                var stock = row.find('select[name="idProduct[]"]').find(':selected').data('stock');
                 var quantity = $(this).val();
                 if (quantity > stock) {
                     $(this).val(stock);
                     quantity = stock;
                 }
-                row.find('input[name="prix_total[]"]').val((price * quantity).toFixed(2));
+                row.find('input[name="total_amount[]"]').val((price * quantity).toFixed(2));
 
                 // Calculer le nouveau total
                 updateTotalAmount();
@@ -159,31 +161,31 @@
             $('.add-new-row').click(function() {
                 var newRow = $('.products-container tr:first').clone();
                 newRow.find('select, input').val('');
-                newRow.find('input[name="prix_total[]"]').val('0.00');
+                newRow.find('input[name="total_amount[]"]').val('0.00');
                 newRow.find('.remove-product').show();
                 $('.products-container').append(newRow);
 
                 // Mettre à jour le prix unitaire et le prix total lorsque vous choisissez un produit
-                $('.products-container').on('change', 'select[name="produit_id[]"]', function() {
+                $('.products-container').on('change', 'select[name="idProduct[]"]', function() {
                     var selectedProduit = $(this).find(':selected');
                     var price = selectedProduit.data('price');
                     var stock = selectedProduit.data('stock');
                     var row = $(this).closest('tr');
-                    row.find('input[name="prix_unitaire[]"]').val(price.toFixed(2));
-                    row.find('input[name="prix_total[]"]').val((price * row.find('input[name="quantite[]"]').val()).toFixed(2));
+                    row.find('input[name="prix[]"]').val(price.toFixed(2));
+                    row.find('input[name="total_amount[]"]').val((price * row.find('input[name="quantity[]"]').val()).toFixed(2));
 
                     // Mettre à jour le stock maximum autorisé
-                    row.find('input[name="quantite[]"]').attr('max', stock);
+                    row.find('input[name="quantity[]"]').attr('max', stock);
 
                     // Calculer le nouveau total
                     updateTotalAmount();
                 });
 
                 // Mettre à jour le prix total lorsqu'une quantité change
-                $('.products-container').on('input', 'input[name="quantite[]"]', function() {
+                $('.products-container').on('input', 'input[name="quantity[]"]', function() {
                     var row = $(this).closest('tr');
-                    var price = row.find('select[name="produit_id[]"]').find(':selected').data('price');
-                    var stock = row.find('select[name="produit_id[]"]').find(':selected').data('stock');
+                    var price = row.find('select[name="idProduct[]"]').find(':selected').data('price');
+                    var stock = row.find('select[name="idProduct[]"]').find(':selected').data('stock');
                     var quantity = $(this).val();
                     if (quantity > stock) {
                         $(this).val(stock);
@@ -193,7 +195,7 @@
                     // Décrémenter la quantité en stock
                     selectedProduit.data('stock', stock - quantity);
 
-                    row.find('input[name="prix_total[]"]').val((price * quantity).toFixed(2));
+                    row.find('input[name="total_amount[]"]').val((price * quantity).toFixed(2));
 
                     // Calculer le nouveau total
                     updateTotalAmount();
@@ -214,11 +216,20 @@
             // Fonction pour mettre à jour le total de la commande
             function updateTotalAmount() {
                 var totalAmount = 0;
-                $('input[name="prix_total[]"]').each(function() {
+                $('input[name="total_amount[]"]').each(function() {
                     totalAmount += parseFloat($(this).val()) || 0;
                 });
                 $('.total-amount').text('$' + totalAmount.toFixed(2));
             }
+
+            $('form').submit(function() {
+                $('.products-container tr').each(function() {
+                    if ($(this).find('select[name="idProduct[]"]').val() === '') {
+                        $(this).remove();
+                    }
+                });
+            });
         });
     </script>
+
 @endsection

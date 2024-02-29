@@ -25,19 +25,19 @@ window.addEventListener('DOMContentLoaded', event => {
 
 });
 
-    // Mise à jour de la barre de progression
-    function updateProgressBar(percentage) {
+// Mise à jour de la barre de progression
+function updateProgressBar(percentage) {
     let progressBar = document.querySelector('.progress-bar');
     progressBar.style.width = percentage + '%';
     progressBar.setAttribute('aria-valuenow', percentage);
 }
 
-    function simulatePurchase() {
+function simulatePurchase() {
     let currentPercentage = parseFloat(document.querySelector('.progress-bar').style.width);
     if (currentPercentage > 0) {
-    let newPercentage = Math.max(0, currentPercentage - 10);
-    updateProgressBar(newPercentage);
-} else {
-    alert('Le produit est en rupture de stock.');
-}
+        let newPercentage = Math.max(0, currentPercentage - 10);
+        updateProgressBar(newPercentage);
+    } else {
+        alert('Le produit est en rupture de stock.');
+    }
 }
