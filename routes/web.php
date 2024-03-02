@@ -31,5 +31,7 @@ Route::resource('/roles', \App\Http\Controllers\RoleController::class);
 Route::resource('/clients', \App\Http\Controllers\ClientController::class );
 Route::resource('/commande', \App\Http\Controllers\CommandeController::class );
 
+Route::get('/orders/customer/{id}', [\App\Http\Controllers\CommandeController::class, 'getCustomerDetails']);
+Route::get('/orders/product/{id}', [\App\Http\Controllers\CommandeController::class, 'getProductDetails']);
 
 

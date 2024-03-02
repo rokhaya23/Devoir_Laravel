@@ -97,4 +97,15 @@ class ClientController extends Controller
 
         return redirect()->route('clients.destroy')->with('success', 'Client supprimé avec succès.');
     }
+
+    public function getClientDetails($id)
+    {
+        $client = Client::find($id);
+
+        return response()->json([
+            'adresse' => $client->adresse,
+            'telephone' => $client->telephone,
+            'sexe' => $client->sexe,
+        ]);
+    }
 }

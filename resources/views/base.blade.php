@@ -46,8 +46,9 @@
 <script src="{{ asset('js/main.js') }}"></script>
 <script src="{{ asset('js/scripts.js') }}"></script>
 
-<!-- Additional Scripts or Inclusions -->
-<!-- Add them here if needed -->
+
+
+
 </body>
 </html>
 

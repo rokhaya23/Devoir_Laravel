@@ -11,6 +11,10 @@ class Commande extends Model
 
     protected $fillable = ['idClient','idProduct','total_amount','date_commande'];
 
+    protected $casts = [
+        'idProduct' => 'array', // Assurez-vous que ce champ est casté comme un tableau
+    ];
+
     public function produits()
     {
         return $this->belongsToMany(Produit::class, 'pivot_commandes', 'idCommande', 'idProduct')

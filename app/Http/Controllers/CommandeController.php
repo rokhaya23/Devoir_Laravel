@@ -21,7 +21,7 @@ class CommandeController extends Controller
      */
     public function index()
     {
-        $commandes = Commande::all();
+        $commandes = Commande::with('produits')->get();
         $clients = Client::all();
         $produits = Produit::all();
         return view('commande.FormCommande', compact('commandes','clients','produits'));
@@ -32,67 +32,71 @@ class CommandeController extends Controller
      */
     public function create()
     {
+        $commande = new Commande();
+
         $clients = Client::all();
         $produits = Produit::all();
 
-        return view('commande.FormCommande', compact('clients', 'produits'));
+        return view('commande.FormCommande', compact('clients', 'produits','commande'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(Request $request)
     {
-        // Validation des champs
-        $request->validate([
+        // Validation des données du formulaire
+        $validatedData = $request->validate([
             'idClient' => 'required|exists:clients,id',
+            'adresse' => 'required|string',
+            'telephone' => 'required|string',
+            'sexe' => 'required|string',
             'date_commande' => 'required|date',
-            'idProdduct' => 'required|array',
-            'total_amount' => 'required|array',
+            'idProduct.*' => 'required|exists:produits,id',
+            'quantity.*' => 'required|integer|min:1',
+            'total_amount' => 'required',
         ]);
 
-        // Extraire les attributs liés au client
-        $clientAttributes = $request->only(['adresse', 'telephone', 'sexe']);
-
-        // Créer une nouvelle commande
         $commande = new Commande;
         $commande->idClient = $request->input('idClient');
+        $commande->total_amount = 0; // Initialisez le total_amount
         $commande->date_commande = $request->input('date_commande');
-        $commande->total_amount = 0;
-
-        // Charger le client et les produits avec leurs relations
-        $commande->load(['client', 'produits']);
-
-        // Mettre à jour les attributs du client
-        $commande->client->update($clientAttributes);
-
-        // Gérer les produits associés à la commande
-        foreach ($request->input('idProduct') as $key => $produit_id) {
-            // Trouver le produit
-            $produit = Produit::findOrFail($produit_id);
-
-            // Calculer le montant total pour ce produit
-            $prix_total = $produit->prix * $request->input('quantite')[$key];
-
-            // Attacher le produit à la commande
-            $commande->produits()->attach($produit_id, [
-                'quantity' => $request->input('quantite')[$key],
-                'prix' => $produit->prix,
-                'total_amount' => $prix_total,
-            ]);
-
-            // Mettre à jour total_amount pour la commande
-            $commande->total_amount += $prix_total;
-        }
-
-        // Sauvegarder le total_amount mis à jour
         $commande->save();
 
-        $selectedClient = Client::findOrFail($request->input('idClient'));
+        $commandeId = $commande->id;
 
-        return redirect()->route('commande.FormCommande')->with('success', 'Commande créée avec succès')->with('selectedClient', $selectedClient);
+        $clientAttributes = [
+            'nom' => $request->user()->nom,
+            'adresse' => $request->input('adresse'),
+            'telephone' => $request->input('telephone'),
+            'sexe' => $request->input('sexe'),
+        ];
 
+        $commande->client()->create($clientAttributes);
+
+        $totalAmount = 0;
+
+        foreach ($request->input('idProduct') as $key => $idProduct) {
+            $produit = Produit::findOrFail($idProduct);
+            $subtotal = $produit->prix * $request->input('quantity')[$key];
+            $totalAmount += $subtotal;
+
+            // Utilisez sync pour gérer la relation many-to-many avec des données pivot
+            $commande->produits()->sync([$idProduct => [
+                'quantity' => $request->input('quantity')[$key],
+                'subtotal' => $subtotal,
+            ]], false);
+        }
+
+        // Mettez à jour le total_amount avant de sauvegarder
+        $commande->total_amount = $totalAmount;
+        $commande->save();
+
+        return redirect()->route('commande.FormCommande')->with('success', 'Commande créée avec succès');
     }
+
+
 
     /**
      * Display the specified resource.
@@ -111,78 +115,95 @@ class CommandeController extends Controller
         $clients = Client::all();
         $produits = Produit::all();
 
-        return view('commande.edit', compact('commande', 'clients', 'produits'));
+        return view('commande.FormCommande', compact('commande', 'clients', 'produits'));
 
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        // Validate the request
-        $request->validate([
+        // Validation des données du formulaire
+        $validatedData = $request->validate([
             'idClient' => 'required|exists:clients,id',
+            'adresse' => 'required|string',
+            'telephone' => 'required|string',
+            'sexe' => 'required|string',
             'date_commande' => 'required|date',
-            'idProdduct' => 'required|array',
-            'total_amount' => 'required|array',
+            'idProduct.*' => 'required|exists:produits,id',
+            'quantity.*' => 'required|integer|min:1',
+            // ... (ajoutez d'autres règles de validation au besoin)
         ]);
 
-        // Extract client-related attributes
-        $clientAttributes = $request->only(['adresse', 'telephone', 'sexe']);
-
-        // Find the Commande
         $commande = Commande::findOrFail($id);
-
-        // Update the Commande
-        $commande->update([
-            'idClient' => $request->input('idClient'),
-            'date_commande' => $request->input('date_commande'),
-        ]);
-
-        // Load the client and produits with their relations
         $commande->load(['client', 'produits']);
+        $clientAttributes = [
+            'adresse' => $request->input('adresse'),
+            'telephone' => $request->input('telephone'),
+            'sexe' => $request->input('sexe'),
+        ];
 
-        // Update the client attributes
         $commande->client->update($clientAttributes);
+        $commande->produits()->detach();
+        $commande->total_amount = 0;
 
-        $commande->produits()->sync();
-
-        // Now, handle the products associated with the commande
         foreach ($request->input('idProduct') as $key => $produit_id) {
-            // Find the Produit
             $produit = Produit::findOrFail($produit_id);
+            $subtotal = $produit->prix * $request->input('quantity')[$key];
 
-            // Calculate total amount for this product
-            $prix_total = $produit->prix * $request->input('quantity')[$key];
-
-            // Attach the produit to the commande
             $commande->produits()->attach($produit_id, [
+                'idCommande' => $commande->id,
                 'quantity' => $request->input('quantity')[$key],
-                'prix' => $produit->prix,
-                'total_amount' => $prix_total,
+                'subtotal' => $subtotal,
             ]);
 
-            // Update total_amount for the commande
-            $commande->total_amount += $prix_total;
+            $commande->total_amount += $subtotal;
         }
 
-        // Save the updated total_amount
         $commande->save();
 
-        return redirect()->route('commande.FormCommande')->with('success', 'Commande updated successfully');
-
+        return redirect()->route('commande.FormCommande')->with('success', 'Commande mise à jour avec succès');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+
+
+
+
+    public function getCustomerDetails($id)
     {
-        $commande = Commande::findOrFail($id);
-        $commande->delete();
+        // Récupérer les détails du client en fonction de l'ID
+        $client = Client::find($id);
 
-        return redirect()->route('commande.FormCommande')->with('success', 'Commande deleted successfully');
+        if (!$client) {
+            return response()->json(['error' => 'Client not found'], 404);
+        }
 
+        // Utiliser les noms de colonnes appropriés
+        return response()->json([
+            'adresse' => $client->adresse,
+            'telephone' => $client->telephone,
+            'sexe' => $client->sexe,
+        ]);
     }
+
+    public function getProductDetails($id)
+    {
+        // Récupérer les détails du produit en fonction de l'ID
+        $product = Produit::find($id);
+
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        return response()->json([
+            'prix' => $product->prix,
+            'quantite_stock' => $product->quantite_stock,
+        ]);
+    }
+
+
 }
