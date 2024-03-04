@@ -9,16 +9,13 @@ class Commande extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['idClient','idProduct','total_amount','date_commande'];
+    protected $fillable = ['idClient','date_commande','status'];
 
-    protected $casts = [
-        'idProduct' => 'array', // Assurez-vous que ce champ est casté comme un tableau
-    ];
 
     public function produits()
     {
         return $this->belongsToMany(Produit::class, 'pivot_commandes', 'idCommande', 'idProduct')
-            ->withPivot('quantity', 'subtotal');
+            ->withPivot('quantity', 'total');
     }
 
     public function client()

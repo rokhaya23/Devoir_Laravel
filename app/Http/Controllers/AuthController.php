@@ -31,15 +31,11 @@ class AuthController extends Controller
 
             // Vérifier si l'utilisateur a le rôle admin
             if (auth()->user()->hasRole('Admin')) {
-                return redirect()->route('users.index');
+                return redirect()->route('dashboard');
             }
             // Vérifier si l'utilisateur a le rôle product_manager
             elseif (auth()->user()->hasRole('Product Manager')) {
                 return redirect()->route('produits.index');
-            }
-            // Vérifier si l'utilisateur a le rôle client
-            elseif (auth()->user()->hasRole('Client')) {
-                return redirect()->route('users.login');
             }
 
             // Redirection par défaut si le rôle n'est pas identifié

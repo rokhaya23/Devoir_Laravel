@@ -6,8 +6,15 @@
 @section('content')
 
     <div class="container mt-lg-5">
+        <div class="row">
+            <div class="col-6">
+                <a class="btn btn-primary" href="{{ route('clients.create') }}">+ Add client</a>
+            </div>
 
-        <a class="btn btn-primary" href="{{ route('clients.create') }}">+ Add client</a>
+            <div class="col-6 text-right ml-auto">
+                <a href="{{ route('clients.pdf') }}" class="btn btn-dark">Télécharger PDF des clients</a>
+            </div>
+        </div>
         <br>
         <br>
 

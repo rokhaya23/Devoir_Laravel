@@ -11,7 +11,7 @@ class Client extends Model
 
     protected $fillable =['nom','adresse','telephone','sexe'];
 
-    public function commande()
+    public function commandes()
     {
         return $this->hasMany(Commande::class, 'idClient');
     }

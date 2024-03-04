@@ -12,6 +12,10 @@
   scroll-behavior: smooth;
 }
 
+.total-column {
+    width: 200px; /* Ajustez la largeur en fonction de vos besoins */
+}
+
 body {
   font-family: "Open Sans", sans-serif;
   background: #f6f9ff;

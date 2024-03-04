@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('commandes', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('idClient');
-            $table->date('date_commande');
-            $table->timestamps();
-
-            $table->foreign('idClient')->references('id')->on('clients')->onDelete('cascade');
+        Schema::table('commandes', function (Blueprint $table) {
+            $table->enum('status', ['En Attente', 'Acceptée', 'Livrée'])->default('En Attente');
         });
     }
 
@@ -26,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('commandes');
+        Schema::table('commandes', function (Blueprint $table) {
+            $table->dropColumn('status');
+        });
     }
 };

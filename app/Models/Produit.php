@@ -24,6 +24,6 @@ class Produit extends Model
     public function commandes()
     {
         return $this->belongsToMany(Commande::class, 'pivot_commandes', 'idCommande', 'idProduct')
-            ->withPivot('quantity', 'subtotal');
+            ->withPivot('quantity', 'total');
     }
 }

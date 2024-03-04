@@ -35,3 +35,8 @@ Route::get('/orders/customer/{id}', [\App\Http\Controllers\CommandeController::c
 Route::get('/orders/product/{id}', [\App\Http\Controllers\CommandeController::class, 'getProductDetails']);
 
 
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+
+Route::get('/generate-pdf', [\App\Http\Controllers\PDFController::class, 'exportPDF'])->name('clients.pdf');
+
+Route::get('/export-produits', [\App\Http\Controllers\ExcelController::class, 'export'])->name('export.excel');

@@ -4,15 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\Commande;
+use App\Models\Pivot;
 use App\Models\Produit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CommandeController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('permission:manage-orders', ['only' => ['index','create','update','store','edit','destroy']]);
+        $this->middleware('permission:manage-orders', ['only' => ['create', 'update', 'store', 'edit']]);
+        $this->middleware('permission:lists_orders', ['only' => ['index', 'show', 'destroy']]);
 
     }
 
@@ -21,10 +24,10 @@ class CommandeController extends Controller
      */
     public function index()
     {
-        $commandes = Commande::with('produits')->get();
+        $commandes = Commande::with('produits', 'client')->get();
         $clients = Client::all();
         $produits = Produit::all();
-        return view('commande.FormCommande', compact('commandes','clients','produits'));
+        return view('commande.ListeCommandes', compact('commandes', 'clients', 'produits'));
     }
 
     /**
@@ -37,7 +40,7 @@ class CommandeController extends Controller
         $clients = Client::all();
         $produits = Produit::all();
 
-        return view('commande.FormCommande', compact('clients', 'produits','commande'));
+        return view('commande.FormCommande', compact('clients', 'produits', 'commande'));
     }
 
     /**
@@ -46,74 +49,70 @@ class CommandeController extends Controller
 
     public function store(Request $request)
     {
-        // Validation des données du formulaire
-        $validatedData = $request->validate([
-            'idClient' => 'required|exists:clients,id',
-            'adresse' => 'required|string',
-            'telephone' => 'required|string',
-            'sexe' => 'required|string',
-            'date_commande' => 'required|date',
-            'idProduct.*' => 'required|exists:produits,id',
-            'quantity.*' => 'required|integer|min:1',
-            'total_amount' => 'required',
+        // Validation des données de la requête
+        $request->validate([
+            'idClient' => 'required',
+            'date_commande' => 'required',
+            'idProduct' => 'required|array',
+            'produits.*.idProduct' => 'required',
+            'produits.*.quantity' => 'required|numeric|min:1',
         ]);
 
-        $commande = new Commande;
-        $commande->idClient = $request->input('idClient');
-        $commande->total_amount = 0; // Initialisez le total_amount
-        $commande->date_commande = $request->input('date_commande');
-        $commande->save();
+        // Utilisation d'une transaction pour garantir l'intégrité des données
+        DB::beginTransaction();
 
-        $commandeId = $commande->id;
+        // Création de la commande
+        $commande = Commande::create([
+            'idClient' => $request->input('idClient'),
+            'date_commande' => $request->input('date_commande'),
+            'status' => 'En Attente',
+        ]);
 
-        $clientAttributes = [
-            'nom' => $request->user()->nom,
-            'adresse' => $request->input('adresse'),
-            'telephone' => $request->input('telephone'),
-            'sexe' => $request->input('sexe'),
-        ];
+        // Ajout des produits à la commande avec la quantité et le total dans la table pivot_commandes
+        foreach ($request->input('idProduct') as $index => $idProduct) {
+            $produit = Produit::find($idProduct);
 
-        $commande->client()->create($clientAttributes);
+            if ($produit) {
+                $quantity = $request->input('quantity')[$index];
+                $total = $produit->prix * $quantity;
 
-        $totalAmount = 0;
+                Pivot::create([
+                    'idProduct' => $produit->id,
+                    'idCommande' => $commande->id,
+                    'quantity' => $quantity,
+                    'total' => $total,
+                ]);
 
-        foreach ($request->input('idProduct') as $key => $idProduct) {
-            $produit = Produit::findOrFail($idProduct);
-            $subtotal = $produit->prix * $request->input('quantity')[$key];
-            $totalAmount += $subtotal;
-
-            // Utilisez sync pour gérer la relation many-to-many avec des données pivot
-            $commande->produits()->sync([$idProduct => [
-                'quantity' => $request->input('quantity')[$key],
-                'subtotal' => $subtotal,
-            ]], false);
+                // Mettez à jour la quantité en stock du produit
+                $produit->decrement('quantite_stock', $quantity);
+            }
         }
 
-        // Mettez à jour le total_amount avant de sauvegarder
-        $commande->total_amount = $totalAmount;
-        $commande->save();
+        // Si tout s'est bien déroulé, valide la transaction
+        DB::commit();
 
-        return redirect()->route('commande.FormCommande')->with('success', 'Commande créée avec succès');
+        return redirect()->route('commande.index')->with('success', 'Commande créée avec succès');
     }
-
 
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Commande $commande)
     {
-        //
+
+        return view('commande.DetailsCommande', compact('commande'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Commande $commande)
     {
-        $commande = Commande::with('client', 'produits')->findOrFail($id);
         $clients = Client::all();
         $produits = Produit::all();
+        // Chargez les produits associés à la commande
+        $commande->load('produits');
 
         return view('commande.FormCommande', compact('commande', 'clients', 'produits'));
 
@@ -122,56 +121,71 @@ class CommandeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Commande $commande)
     {
-        // Validation des données du formulaire
-        $validatedData = $request->validate([
-            'idClient' => 'required|exists:clients,id',
-            'adresse' => 'required|string',
-            'telephone' => 'required|string',
-            'sexe' => 'required|string',
-            'date_commande' => 'required|date',
-            'idProduct.*' => 'required|exists:produits,id',
-            'quantity.*' => 'required|integer|min:1',
-            // ... (ajoutez d'autres règles de validation au besoin)
+        // Validation des données de la requête pour la mise à jour
+        $request->validate([
+            'idClient' => 'required',
+            'date_commande' => 'required',
+            'idProduct' => 'required|array',
+            'quantity' => 'required|array',
         ]);
 
-        $commande = Commande::findOrFail($id);
-        $commande->load(['client', 'produits']);
-        $clientAttributes = [
-            'adresse' => $request->input('adresse'),
-            'telephone' => $request->input('telephone'),
-            'sexe' => $request->input('sexe'),
-        ];
+        // Utilisation d'une transaction pour garantir l'intégrité des données
+        DB::beginTransaction();
 
-        $commande->client->update($clientAttributes);
-        $commande->produits()->detach();
-        $commande->total_amount = 0;
-
-        foreach ($request->input('idProduct') as $key => $produit_id) {
-            $produit = Produit::findOrFail($produit_id);
-            $subtotal = $produit->prix * $request->input('quantity')[$key];
-
-            $commande->produits()->attach($produit_id, [
-                'idCommande' => $commande->id,
-                'quantity' => $request->input('quantity')[$key],
-                'subtotal' => $subtotal,
+            // Mise à jour de la commande
+            $commande->update([
+                'idClient' => $request->input('idClient'),
+                'date_commande' => $request->input('date_commande'),
             ]);
 
-            $commande->total_amount += $subtotal;
-        }
+            // Suppression des produits associés à la commande dans la table pivot_commande
+            $commande->produits()->detach();
 
-        $commande->save();
+            // Ajout des produits mis à jour à la commande avec la quantité et le total dans la table pivot_commande
+            foreach ($request->input('idProduct') as $index => $idProduct) {
+                $produit = Produit::find($idProduct);
 
-        return redirect()->route('commande.FormCommande')->with('success', 'Commande mise à jour avec succès');
+                if ($produit) {
+                    $quantity = $request->input('quantity')[$index];
+                    $total = $produit->prix * $quantity;
+
+                    $commande->produits()->attach($produit->id, [
+                        'quantity' => $quantity,
+                        'total' => $total,
+                    ]);
+
+                    // Mettez à jour la quantité en stock du produit
+                    $produit->decrement('quantite_stock', $quantity);
+                }
+            }
+
+            // Si tout s'est bien déroulé, valide la transaction
+            DB::commit();
+
+            return redirect()->route('commande.index')->with('success', 'Commande mise à jour avec succès');
+
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
 
+    public function destroy(Commande $commande)
+    {
+        // Vérifiez le statut de la commande avant de permettre la suppression
+        if ($commande->status === 'En Attente') {
+            // Supprimez la commande et ses relations (à adapter selon vos besoins)
+            $commande->produits()->detach();
+            $commande->delete();
 
-
+            return redirect()->route('commandes.index')->with('success', 'Commande supprimée avec succès');
+        } else {
+            return redirect()->route('commandes.index')->with('error', 'Impossible de supprimer une commande non en attente');
+        }
+    }
 
     public function getCustomerDetails($id)
     {
@@ -204,6 +218,7 @@ class CommandeController extends Controller
             'quantite_stock' => $product->quantite_stock,
         ]);
     }
+
 
 
 }

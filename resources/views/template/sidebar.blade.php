@@ -5,7 +5,7 @@
                 @auth
                     @can('voir-dashboard')
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('users.index') }}">
+                            <a class="nav-link" href="{{ route('dashboard') }}">
                                 <i class="bi bi-grid"></i>
                                 <span>Dashboard</span>
                             </a>
@@ -28,8 +28,12 @@
                         </a>
                         <ul class="submenu-list collapse" id="submenu-orders">
                             @can('manage-orders')
-                                <li><a href="{{ route('commande.index') }}">Manage Orders</a></li>
+                                <li><a href="{{ route('commande.create') }}">Manage Orders</a></li>
                             @endcan
+
+                            @can('lists_orders')
+                                    <li><a href="{{ route('commande.index') }}">Lists Orders</a></li>
+                                @endcan
 
                             @can('validate-orders')
                                 <li><a href="{{ route('users.index') }}">Validate Orders</a></li>

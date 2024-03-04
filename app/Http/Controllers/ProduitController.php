@@ -21,7 +21,6 @@ class ProduitController extends Controller
 
     public function index()
     {
-
         $produits = Produit::all();
         return view('produit.details', compact('produits'));
     }

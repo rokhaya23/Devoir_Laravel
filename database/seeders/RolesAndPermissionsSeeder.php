@@ -27,6 +27,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'create-roles',
             'create-clients',
             'manage-orders',
+            'lists_orders',
         ];
 
         foreach ($permissions as $permission) {
@@ -41,6 +42,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage-products',
             'manage-orders',
             'create-clients',
+            'lists_orders',
         ]);
 
 
@@ -52,6 +54,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'create-roles',
             'create-clients',
             'validate-orders',
+            'lists_orders',
         ]);
 
 //creer des utilisateurs

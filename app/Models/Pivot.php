@@ -11,5 +11,5 @@ class Pivot extends Model
 
     protected $table = 'pivot_commandes';
 
-    protected $fillable = ['idProduct','idCommande','quantity','subtotal'];
+    protected $fillable = ['idProduct','idCommande','quantity','total'];
 }

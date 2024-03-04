@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('idCommande');
             $table->unsignedBigInteger('idProduct');
             $table->integer('quantity');
-            $table->double('subtotal');
+            $table->double('total');
             $table->timestamps();
 
             $table->foreign('idCommande')->references('id')->on('commandes')->onDelete('cascade');

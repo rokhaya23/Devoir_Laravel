@@ -11,6 +11,9 @@
             <div class="col-6">
                 <a class="btn btn-primary" href="{{ route('produits.create') }}">+ Add Product</a>
             </div>
+            <div class="col-6 text-right ml-auto">
+                <a href="{{ route('export.excel') }}" class="btn btn-dark"> Export to Excel</a>
+            </div>
         </div>
         <br>
         <br>
