@@ -21,7 +21,7 @@
                     <td>{{ $commande->id }}</td>
                     <td>{{ $commande->client->nom }}</td>
                     <td>
-                        <a href="{{ route('commande.showList', ['commande' => $commande->id]) }}" class="btn btn-primary">Show</a>
+                        <a href="{{ route('status', ['commande' => $commande->id]) }}" class="btn btn-primary">Show</a>
                     </td>
                 </tr>
             @endforeach

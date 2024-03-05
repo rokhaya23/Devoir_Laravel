@@ -15,28 +15,6 @@
         <p>Adresse du client: {{ $commande->client->adresse }}</p>
         <p>Téléphone du client: {{ $commande->client->telephone }}</p>
 
-        <!-- Liste des produits commandés -->
-        <h3>Produits commandés</h3>
-        <table class="table table-bordered">
-            <thead>
-            <tr>
-                <th>Produit</th>
-                <th>Quantité</th>
-                <th>Prix unitaire</th>
-                <th>Total</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach ($commande->produits as $produit)
-                <tr>
-                    <td>{{ $produit->nom }}</td>
-                    <td>{{ $produit->pivot->quantity }}</td>
-                    <td>{{ $produit->prix }}</td>
-                    <td>{{ $produit->pivot->total }}</td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
 
         <!-- Statut de la commande -->
         <h3>Statut de la commande</h3>
@@ -44,7 +22,7 @@
 
         <!-- Modifier le statut de la commande -->
         <h3>Modifier le statut</h3>
-        <form action="{{ route('commande.updateStatus', ['commande' => $commande->id]) }}" method="POST">
+        <form action="{{ route('updateStatus', ['commande' => $commande->id]) }}" method="POST">
             @csrf
             @method('PATCH')
 
@@ -60,7 +38,4 @@
             <button type="submit" class="btn btn-primary">Mettre à jour le statut</button>
         </form>
 
-        <!-- Retour à la liste des commandes -->
-        <a href="{{ route('commande.index') }}" class="btn btn-primary">Retour à la liste des commandes</a>
-    </div>
 @endsection

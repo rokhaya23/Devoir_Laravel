@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UtilisateurRequest;
+use App\Models\Commande;
 use App\Models\Produit;
 use App\Models\User;
 use App\Models\Utilisateur;
@@ -100,6 +101,11 @@ class UtilisateurController extends Controller
 
         $user->delete();
         return redirect()->route('users.index')->with('success', 'Utilisateur supprimé avec succès.');
+    }
+
+    public function show(Utilisateur $user)
+    {
+        return view('utilisateur.show', compact('user'));
     }
 
 

@@ -36,7 +36,7 @@
                                 @endcan
 
                             @can('validate-orders')
-                                <li><a href="{{ route('users.index') }}">Validate Orders</a></li>
+                                <li><a href="{{ route('valider-commande') }}">Validate Orders</a></li>
                             @endcan
                         </ul>
                     </li>

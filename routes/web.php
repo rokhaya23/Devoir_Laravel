@@ -40,3 +40,7 @@ Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'ind
 Route::get('/generate-pdf', [\App\Http\Controllers\PDFController::class, 'exportPDF'])->name('clients.pdf');
 
 Route::get('/export-produits', [\App\Http\Controllers\ExcelController::class, 'export'])->name('export.excel');
+
+Route::get('/valider-commande', [\App\Http\Controllers\ValiderCommandeController::class, 'List'])->name('valider-commande');
+Route::get('/valider-commande/{commande}', [\App\Http\Controllers\ValiderCommandeController::class, 'showList'])->name('status');
+Route::patch('/valider-commande/{commande}/update-status', [\App\Http\Controllers\ValiderCommandeController::class, 'updateStatus'])->name('updateStatus');

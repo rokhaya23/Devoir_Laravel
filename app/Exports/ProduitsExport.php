@@ -43,8 +43,6 @@ class ProduitsExport implements FromCollection  ,WithMapping,WithHeadings,Should
     public function map( $produit ): array
     {
         $produit->load('category');
-        $imageUrl = Storage::url($produit->photo);
-
         return [
             $produit->id,
             $produit->nom,
@@ -52,7 +50,7 @@ class ProduitsExport implements FromCollection  ,WithMapping,WithHeadings,Should
             $produit->prix,
             $produit->quantite_stock,
             $produit->category->libelle,
-            $imageUrl,
+            $produit->photo,
         ];
     }
 
