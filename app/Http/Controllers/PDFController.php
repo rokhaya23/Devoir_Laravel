@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 
 class PDFController extends Controller
 {
-    public function exportPDF()
+    public function generatePDF()
     {
         $clients = Client::all();
 
-        $pdf = Pdf::loadView('client.client-pdf', compact('clients'));
+        $pdf = PDF::loadView('client.client-pdf', compact('clients'));
 
-        return $pdf->download('clients-list.pdf');
+        return $pdf->download('Liste-Client.pdf');
     }
 }

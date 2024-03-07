@@ -134,35 +134,46 @@ class CommandeController extends Controller
         // Utilisation d'une transaction pour garantir l'intégrité des données
         DB::beginTransaction();
 
-            // Mise à jour de la commande
-            $commande->update([
-                'idClient' => $request->input('idClient'),
-                'date_commande' => $request->input('date_commande'),
-            ]);
+        $oldQuantities = [];
 
-            // Suppression des produits associés à la commande dans la table pivot_commande
-            $commande->produits()->detach();
+        foreach ($commande->produits as $produit) {
+            $oldQuantities[$produit->id] = $produit->pivot->quantity;
+        }
 
-            // Ajout des produits mis à jour à la commande avec la quantité et le total dans la table pivot_commande
-            foreach ($request->input('idProduct') as $index => $idProduct) {
-                $produit = Produit::find($idProduct);
+        // Mise à jour de la commande
+        $commande->update([
+            'idClient' => $request->input('idClient'),
+            'date_commande' => $request->input('date_commande'),
+        ]);
 
-                if ($produit) {
-                    $quantity = $request->input('quantity')[$index];
-                    $total = $produit->prix * $quantity;
+        // Suppression des produits associés à la commande dans la table pivot_commande
+        $commande->produits()->detach();
 
-                    $commande->produits()->attach($produit->id, [
-                        'quantity' => $quantity,
-                        'total' => $total,
-                    ]);
+        // Ajout des produits mis à jour à la commande avec la quantité et le total dans la table pivot_commande
+        foreach ($request->input('idProduct') as $index => $idProduct) {
+            $produit = Produit::find($idProduct);
 
-                    // Mettez à jour la quantité en stock du produit
-                    $produit->decrement('quantite_stock', $quantity);
+            if ($produit) {
+                $quantity = $request->input('quantity')[$index];
+                $total = $produit->prix * $quantity;
+
+                $commande->produits()->attach($produit->id, [
+                    'quantity' => $quantity,
+                    'total' => $total,
+                ]);
+
+                // Mettez à jour la quantité en stock du produit
+                $produit->decrement('quantite_stock', $quantity);
+
+                // Restituer la quantité précédente au stock
+                if (isset($oldQuantities[$produit->id])) {
+                    $produit->increment('quantite_stock', $oldQuantities[$produit->id]);
                 }
             }
+        }
 
-            // Si tout s'est bien déroulé, valide la transaction
-            DB::commit();
+        // Si tout s'est bien déroulé, valide la transaction
+        DB::commit();
 
             return redirect()->route('commande.index')->with('success', 'Commande mise à jour avec succès');
 
@@ -175,17 +186,38 @@ class CommandeController extends Controller
 
     public function destroy(Commande $commande)
     {
-        // Vérifiez le statut de la commande avant de permettre la suppression
-        if ($commande->status === 'En Attente') {
-            // Supprimez la commande et ses relations (à adapter selon vos besoins)
-            $commande->produits()->detach();
-            $commande->delete();
+        // Utilisation d'une transaction pour garantir l'intégrité des données
+        DB::beginTransaction();
 
-            return redirect()->route('commandes.index')->with('success', 'Commande supprimée avec succès');
-        } else {
-            return redirect()->route('commandes.index')->with('error', 'Impossible de supprimer une commande non en attente');
+            // Vérifiez le statut de la commande avant de permettre la suppression
+            if ($commande->status === 'En Attente') {
+                // Récupérez les informations sur les produits liés à la commande
+                $productsInfo = [];
+
+                foreach ($commande->produits as $produit) {
+                    $productsInfo[] = [
+                        'id' => $produit->id,
+                        'quantity' => $produit->pivot->quantity,
+                    ];
+                }
+
+                // Supprimez la commande et ses relations
+                $commande->produits()->detach();
+                $commande->delete();
+
+                // Restituer la quantité au stock
+                foreach ($productsInfo as $productInfo) {
+                    $produit = Produit::find($productInfo['id']);
+                    if ($produit) {
+                        $produit->increment('quantite_stock', $productInfo['quantity']);
+                    }
+                }
+
+                // Si tout s'est bien déroulé, valide la transaction
+                DB::commit();
+
+            }
         }
-    }
 
     public function getCustomerDetails($id)
     {
