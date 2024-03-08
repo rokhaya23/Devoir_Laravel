@@ -97,7 +97,7 @@ class ClientController extends Controller
         // Suppression du client
         $client->delete();
 
-        return redirect()->route('clients.destroy')->with('success', 'Client supprimé avec succès.');
+        return redirect()->route('clients.index')->with('success', 'Client supprimé avec succès.');
     }
 
 

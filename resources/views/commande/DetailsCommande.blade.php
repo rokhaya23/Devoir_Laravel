@@ -1,32 +1,32 @@
 @extends('base')
 @extends('template.sidebar')
 
-@section('title', 'Détails de la commande')
+@section('title', 'Order Details')
 
 @section('content')
     <div class="container mt-5">
         <div class="card">
             <div class="card-header bg-info text-white">
-                <h2 class="mb-0">Détails de la commande #{{ $commande->id }}</h2>
+                <h2 class="mb-0">Order Details #{{ $commande->id }}</h2>
             </div>
             <div class="card-body">
-                <!-- Informations sur le client -->
+                <!-- Customer Information -->
                 <div class="mb-4">
-                    <h3 class="text-info">Informations sur le client</h3>
-                    <p class="mb-1"><strong>Nom du client:</strong> {{ $commande->client->nom }}</p>
-                    <p class="mb-1"><strong>Adresse du client:</strong> {{ $commande->client->adresse }}</p>
-                    <p class="mb-1"><strong>Téléphone du client:</strong> {{ $commande->client->telephone }}</p>
+                    <h3 class="text-info">Customer Information</h3>
+                    <p class="mb-1"><strong>Customer Name:</strong> {{ $commande->client->nom }}</p>
+                    <p class="mb-1"><strong>Customer Address:</strong> {{ $commande->client->adresse }}</p>
+                    <p class="mb-1"><strong>Customer Phone:</strong> {{ $commande->client->telephone }}</p>
                 </div>
 
-                <!-- Liste des produits commandés -->
+                <!-- List of Ordered Products -->
                 <div>
-                    <h3 class="text-info">Produits commandés</h3>
+                    <h3 class="text-info">Ordered Products</h3>
                     <table class="table table-bordered">
                         <thead>
                         <tr>
-                            <th>Produit</th>
-                            <th>Quantité</th>
-                            <th>Prix unitaire</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
                             <th>Total</th>
                         </tr>
                         </thead>

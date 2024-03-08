@@ -1,14 +1,14 @@
 @extends('base')
 @extends('template.sidebar ')
 
-@section('title', 'Formulaire Utilisateur')
+@section('title', 'User Form')
 
 @section('content')
 
     <div class="container mt-lg-5">
         <div class="card">
             <div class="card-header bg-success-subtle">
-                {{ $user->exists ? "Modifier Utilisateur" : "Formulaire Ajout Utilisateur" }}
+                {{ $user->exists ? "Edit User" : "Add User Form" }}
             </div>
             <div class="card-body">
                 <form method="post" action="{{ route($user->exists ? 'users.update' : 'users.store', $user) }}" enctype="multipart/form-data">
@@ -16,7 +16,7 @@
                     @method($user->exists ? 'put' : 'post')
 
                     <div class="mb-3 row">
-                        <label for="nom" class="col-md-4 col-form-label text-md-end text-start">Nom</label>
+                        <label for="nom" class="col-md-4 col-form-label text-md-end text-start">Last Name</label>
                         <div class="col-md-6">
                             <input type="text" class="form-control @error('nom') is-invalid @enderror" id="nom" name="nom" value="{{ $user->nom }}" required>
                             @if ($errors->has('nom'))
@@ -26,7 +26,7 @@
                     </div>
 
                     <div class="mb-3 row">
-                        <label for="name" class="col-md-4 col-form-label text-md-end text-start">Prenom</label>
+                        <label for="name" class="col-md-4 col-form-label text-md-end text-start">First Name</label>
                         <div class="col-md-6">
                             <input type="text" class="form-control @error('prenom') is-invalid @enderror" id="prenom" name="prenom" value="{{ $user->prenom }}" required>
                             @if ($errors->has('prenom'))
@@ -81,10 +81,9 @@
                         </div>
                     </div>
 
-
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-outline-secondary">Fermer</button>
-                        <button type="submit" class="btn btn-primary">{{ $user->exists ? "Modifier" : "Ajouter" }}</button>
+                        <button type="submit" class="btn btn-outline-secondary">Close</button>
+                        <button type="submit" class="btn btn-primary">{{ $user->exists ? "Edit" : "Add" }}</button>
                     </div>
                 </form>
             </div>

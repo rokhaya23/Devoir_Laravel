@@ -14,7 +14,7 @@
         </form>
     </div><!-- End Search Bar  -->
 
-    <<li class="nav-item dropdown ms-auto pe-3">
+    <li class="nav-item dropdown ms-auto pe-3">
         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
             @if(Auth::check())
                 <div class="dropdown-toggle d-flex align-items-center user-settings">

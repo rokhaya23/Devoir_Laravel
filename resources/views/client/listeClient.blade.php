@@ -8,11 +8,11 @@
     <div class="container mt-lg-5">
         <div class="row">
             <div class="col-6">
-                <a class="btn btn-primary" href="{{ route('clients.create') }}">+ Add client</a>
+                <a class="btn btn-primary" href="{{ route('clients.create') }}">+ Add Client</a>
             </div>
 
             <div class="col-6 text-right ml-auto">
-                <a href="{{ route('clients.pdf') }}" class="btn btn-dark">Télécharger PDF des clients</a>
+                <a href="{{ route('clients.pdf') }}" class="btn btn-dark">Download Clients PDF</a>
             </div>
         </div>
         <br>
@@ -25,10 +25,10 @@
                     <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Nom</th>
-                        <th scope="col">Adresse</th>
-                        <th scope="col">Sexe</th>
-                        <th scope="col">Téléphone</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Address</th>
+                        <th scope="col">Gender</th>
+                        <th scope="col">Phone</th>
                         <th scope="col">Options</th>
                     </tr>
                     </thead>
@@ -42,11 +42,11 @@
                             <td>{{ $client->telephone }}</td>
                             <td>
                                 <div class="d-inline-flex gap-3">
-                                    <!-- Bouton de modification -->
+                                    <!-- Edit button -->
                                     <a href="{{ route('clients.edit', $client->id) }}" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i></a>
 
-                                    <!-- Bouton de suppression -->
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ route('clients.destroy', $client->id) }}')"><i class="bi bi-trash"></i></button>
+                                    <!-- Delete button -->
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('{{ route('clients.index', $client->id) }}')"><i class="bi bi-trash"></i></button>
                                 </div>
                             </td>
                         </tr>
@@ -60,17 +60,15 @@
 
                     </tbody>
                 </table>
-
-
             </div>
         </div>
     </div>
 
     <script>
         function confirmDelete(url) {
-            // Ajoutez votre logique de confirmation de suppression ici
-            if (confirm('Voulez-vous vraiment supprimer cet élément?')) {
-                // Rediriger vers l'URL de suppression
+            // Add your delete confirmation logic here
+            if (confirm('Do you really want to delete this item?')) {
+                // Redirect to the delete URL
                 window.location.href = url;
             }
         }

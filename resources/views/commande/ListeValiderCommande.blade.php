@@ -1,17 +1,17 @@
 @extends('base')
 @extends('template.sidebar')
 
-@section('title', 'Liste des commandes')
+@section('title', 'List of Orders')
 
 @section('content')
     <div class="container mt-lg-5">
-        <h2>Liste des commandes</h2>
+        <h2>List of Orders</h2>
 
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>Numéro de commande</th>
-                <th>Nom du client</th>
+                <th>Order Number</th>
+                <th>Customer Name</th>
                 <th>Action</th>
             </tr>
             </thead>

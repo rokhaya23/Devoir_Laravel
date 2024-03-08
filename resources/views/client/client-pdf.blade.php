@@ -46,10 +46,10 @@
     <thead>
     <tr>
         <th>#</th>
-        <th>Nom</th>
+        <th>Name</th>
         <th>Adresse</th>
         <th>Sexe</th>
-        <th>Téléphone</th>
+        <th>Telephone</th>
     </tr>
     </thead>
     <tbody>

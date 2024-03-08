@@ -1,18 +1,18 @@
 @extends('base')
 @extends('template.sidebar')
 
-@section('title', 'Liste des commandes')
+@section('title', 'List of Orders')
 
 @section('content')
     <div class="container mt-lg-5">
         <div class="card mb-2">
             <div class="card-body">
-                <Legend class="bg-success">Liste des commandes</Legend>
+                <legend class="bg-success">List of Orders</legend>
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>ID Commande</th>
-                        <th>Nom du Client</th>
+                        <th>Order ID</th>
+                        <th>Customer Name</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -36,13 +36,11 @@
                                     <form action="{{ route('commande.destroy', ['commande' => $commande->id]) }}" method="POST" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Do you want to delete this order?');">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
-
                                 @endif
-
                             </td>
                         </tr>
                     @endforeach

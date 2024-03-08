@@ -1,7 +1,7 @@
 @extends('base')
 @extends('template.sidebar ')
 
-@section('title', 'Produits')
+@section('title', 'Products')
 
 @section('content')
 
@@ -36,20 +36,20 @@
         </div>
     </div>
 
-    <!-- Script pour afficher les détails lors du clic sur l'image -->
+    <!-- Script to display details when clicking on the image -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Sélectionnez toutes les images avec l'id "main-image"
+            // Select all images with the id "main-image"
             var images = document.querySelectorAll('#main-image');
 
-            // Ajoutez un gestionnaire d'événements pour chaque image
+            // Add an event listener for each image
             images.forEach(function (image) {
                 image.addEventListener('click', function () {
-                    // Récupérez l'URL de l'image cliquée
+                    // Get the URL of the clicked image
                     var imageUrl = this.src;
 
-                    // Affichez les détails ou effectuez une action de votre choix (par exemple, ouvrez une modale avec les détails)
-                    console.log('Cliquez sur l\'image pour afficher les détails:', imageUrl);
+                    // Display details or perform an action of your choice (e.g., open a modal with details)
+                    console.log('Click on the image to display details:', imageUrl);
                 });
             });
         });

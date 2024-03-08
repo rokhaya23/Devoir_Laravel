@@ -1,7 +1,7 @@
 @extends('base')
 @extends('template.sidebar')
 
-@section('title', $commande->exists ? 'Modifier une commande' : 'Créer une commande')
+@section('title', $commande->exists ? 'Edit Order' : 'Create Order')
 
 @section('content')
     <div class="container mt-lg-5">
@@ -16,15 +16,15 @@
                             @endif
 
                             <fieldset>
-                                <legend class="bg-success">Informations sur le client</legend>
+                                <legend class="bg-success">Customer Information</legend>
                                 <div class="row">
                                     <div class="col-sm-6 col-12">
                                         <div class="mb-3">
-                                            <label for="client" class="form-label">Client:</label>
+                                            <label for="client" class="form-label">Customer:</label>
                                             <br>
                                             <br>
                                             <select id="client" name="idClient" class="form-select">
-                                                <option value="" selected disabled>Sélectionnez le client</option>
+                                                <option value="" selected disabled>Select the customer</option>
                                                 @foreach ($clients as $client)
                                                     <option value="{{ $client->id }}" {{ $commande->idClient == $client->id ? 'selected' : '' }}>{{ $client->nom }}</option>
                                                 @endforeach
@@ -33,15 +33,15 @@
                                     </div>
                                     <div class="col-sm-6 col-12">
                                         <div class="mb-3">
-                                            <label for="adresse" class="form-label">Adresse</label>
+                                            <label for="adresse" class="form-label">Address</label>
                                             <input type="text" id="adresse" name="adresse" class="form-control" readonly>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="telephone" class="form-label">Téléphone</label>
+                                            <label for="telephone" class="form-label">Phone</label>
                                             <input type="text" id="telephone" name="telephone" class="form-control" readonly>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="sexe" class="form-label">Sexe</label>
+                                            <label for="sexe" class="form-label">Gender</label>
                                             <input type="text" id="sexe" name="sexe" class="form-control" readonly>
                                         </div>
                                     </div>
@@ -52,27 +52,25 @@
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="mb-3">
-                                            <label for="date_commande" class="form-label">Date de la commande</label>
+                                            <label for="date_commande" class="form-label">Order Date</label>
                                             <input type="date" id="date_commande" name="date_commande" class="form-control datepicker-opens-left" value="{{ $commande->exists ? $commande->date_commande : '' }}">
-
                                         </div>
                                     </div>
                                 </div>
                             </fieldset>
 
-
                             <fieldset>
-                                <legend class="bg-success">Produits</legend>
+                                <legend class="bg-success">Products</legend>
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="table-responsive">
                                             <table class="table table-bordered">
                                                 <thead>
                                                 <tr>
-                                                    <th>Produit</th>
+                                                    <th>Product</th>
                                                     <th>Stock</th>
-                                                    <th>Quantité</th>
-                                                    <th>Prix Unitaire</th>
+                                                    <th>Quantity</th>
+                                                    <th>Unit Price</th>
                                                     <th>Actions</th>
                                                 </tr>
                                                 </thead>
@@ -81,7 +79,7 @@
                                                     <tr>
                                                         <td>
                                                             <select class="form-select produit" name="idProduct[]">
-                                                                <option value="" selected disabled>Sélectionnez le produit</option>
+                                                                <option value="" selected disabled>Select the product</option>
                                                                 @foreach ($produits as $p)
                                                                     <option value="{{ $p->id }}" data-stock="{{ $p->quantite_stock }}" data-prix="{{ $p->prix }}" {{ $produit->id == $p->id ? 'selected' : '' }}>{{ $p->nom }}</option>
                                                                 @endforeach
@@ -104,11 +102,11 @@
                                                     </tr>
                                                 @endforeach
 
-                                                <!-- Ligne de produit cachée servant de modèle -->
+                                                <!-- Hidden product row serving as a template -->
                                                 <tr class="hidden-row">
                                                     <td>
                                                         <select class="form-select produit" name="idProduct[]">
-                                                            <option value="" selected disabled>Sélectionnez le produit</option>
+                                                            <option value="" selected disabled>Select the product</option>
                                                             @foreach ($produits as $produit)
                                                                 <option value="{{ $produit->id }}" data-stock="{{ $produit->quantite_stock }}" data-prix="{{ $produit->prix }}">{{ $produit->nom }}</option>
                                                             @endforeach
@@ -133,13 +131,13 @@
                                                 <tfoot>
                                                 <tr>
                                                     <td colspan="3">
-                                                        <!-- Bouton "Ajouter une ligne" -->
-                                                        <button type="button" class="btn btn-outline-primary text-nowrap add-new-row">Ajouter une ligne</button>
+                                                        <!-- "Add new row" button -->
+                                                        <button type="button" class="btn btn-outline-primary text-nowrap add-new-row">Add a row</button>
                                                     </td>
                                                     <td colspan="3">&nbsp;</td>
                                                     <td class="total-column">
                                                         <p class="m-0">Total </p>
-                                                        <h5 class="mt-2 text-primary total-amount">F0.00</h5>
+                                                        <h5 class="mt-2 text-primary total-amount">$0.00</h5>
                                                     </td>
                                                 </tr>
                                                 </tfoot>
@@ -152,7 +150,7 @@
                             <div class="row">
                                 <div class="col-12">
                                     <div class="text-end">
-                                        <button type="submit" class="btn btn-success">{{ $commande->exists ? "Modifier la commande" : "Valider la commande" }}</button>
+                                        <button type="submit" class="btn btn-success">{{ $commande->exists ? "Edit Order" : "Confirm Order" }}</button>
                                     </div>
                                 </div>
                             </div>
