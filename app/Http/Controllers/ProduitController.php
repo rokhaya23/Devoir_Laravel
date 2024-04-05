@@ -61,7 +61,6 @@ class ProduitController extends Controller
      */
     public function show(Produit $produit)
     {
-        // Récupérez d'autres produits comme suggestions (exemple: les 4 derniers produits)
         $suggestedProducts = Produit::get();
 
         return view('produit.show', compact('produit','suggestedProducts'));

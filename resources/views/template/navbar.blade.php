@@ -18,7 +18,7 @@
         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
             @if(Auth::check())
                 <div class="dropdown-toggle d-flex align-items-center user-settings">
-                    <img src="{{ asset('storage/photos/' . Auth::user()->photo) }}" class="img-3x m-2 me-0 rounded-5" alt="Profile">
+                    <img src="{{ asset('storage/photos/' . Auth::user()->photo) }}" class="img-3x m-2 me-0 rounded-5" alt="">
                     <span class="d-none d-md-block ps-2">{{ Auth::user()->nom }}</span>
                 </div>
             @else
