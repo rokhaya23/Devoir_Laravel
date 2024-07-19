@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('commandes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('idClient');
+            $table->unsignedBigInteger('idUser');
             $table->date('date_commande');
             $table->timestamps();
 
-            $table->foreign('idClient')->references('id')->on('clients')->onDelete('cascade');
+            $table->foreign('idUser')->references('id')->on('utilisateurs')->onDelete('cascade');
+
         });
     }
 

@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
+
 
 class Produit extends Model
 {
+    use HasFactory, HasApiTokens;
     protected $fillable = [
         'nom',
         'description',
@@ -24,6 +27,6 @@ class Produit extends Model
     public function commandes()
     {
         return $this->belongsToMany(Commande::class, 'pivot_commandes', 'idCommande', 'idProduct')
-            ->withPivot('quantity', 'total');
+            ->withPivot('quantity', 'totale');
     }
 }

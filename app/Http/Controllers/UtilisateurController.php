@@ -26,8 +26,9 @@ class UtilisateurController extends Controller
     {
 
         $users = Utilisateur::all(); // Récupérez tous les produits disponibles
+        return response()->json($users);
 
-        return view('utilisateur.utilisateur', compact('users'));
+//        return view('utilisateur.utilisateur', compact('users'));
     }
 
     public function create()
