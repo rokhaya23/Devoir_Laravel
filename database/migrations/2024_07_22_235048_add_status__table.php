@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('commandes', function (Blueprint $table) {
-            $table->enum('status', ['En Attente', 'Acceptée', 'Livrée'])->default('En Attente');
+            $table->string('status')->default('En Attente');
+
         });
     }
 
@@ -22,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('commandes', function (Blueprint $table) {
-            $table->dropColumn('status');
+            //
         });
     }
 };

@@ -43,14 +43,20 @@ Route::middleware(['auth:sanctum',EShopMiddleware::class])->group(function () {
     //COMMANDES
     Route::get('/commandes', [CommandeController::class, 'index']);
     Route::post('/commandes', [CommandeController::class, 'createOrder']);
-    Route::get('/commandes/{commande}', [CommandeController::class, 'show']);
-    Route::put('/commandes/{commande}', [CommandeController::class, 'update']);
-    Route::delete('/commandes/{commande}', [CommandeController::class, 'destroy']);
+    Route::get('/commandes/{id}', [CommandeController::class, 'show']);
+    Route::put('/commandes/{id}', [CommandeController::class, 'update']);
+    Route::delete('/commandes/{id}', [CommandeController::class, 'destroy']);
+    Route::get('/commandes-validated', [CommandeController::class, 'fetchValidatedOrders']);
+    Route::put('/commande/{id}', [CommandeController::class, 'updateOrderStatus']);
+
 });
 
 Route::get('/produits', [ProduitController::class, 'index']);
 Route::get('/produits/{produit}', [ProduitController::class, 'show']);
 Route::get('/produits/related', [ProduitController::class, 'related']);
+Route::get('/random-products1', [ProduitController::class, 'getRandomProducts1']);
+Route::get('/random-products2', [ProduitController::class, 'getRandomProducts2']);
+
 
 Route::post('/register-and-order', [CommandeController::class, 'registerAndCreateOrder']);
 

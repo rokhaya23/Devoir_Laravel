@@ -107,4 +107,18 @@ class ProduitController extends Controller
 
         return response()->json($relatedProducts,200);
     }
+
+
+    public function getRandomProducts1()
+    {
+        // Récupère 4 produits aléatoires
+        $products = Produit::inRandomOrder()->limit(4)->get();
+        return response()->json($products);
+    }
+    public function getRandomProducts2()
+    {
+        // Récupère 4 produits aléatoires
+        $products = Produit::inRandomOrder()->limit(4)->get();
+        return response()->json($products);
+    }
 }

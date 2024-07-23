@@ -83,7 +83,7 @@ class AuthController extends Controller
             } else {
                 return response()->json([
                     'status' => 500,
-                    'message' => 'Le rôle par défaut "Apprenant" est introuvable.'
+                    'message' => 'Le rôle par défaut "Client" est introuvable.'
                 ], 500);
             }
 
