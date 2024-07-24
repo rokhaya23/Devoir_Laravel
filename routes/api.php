@@ -6,6 +6,7 @@ use App\Http\Middleware\EShopMiddleware;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\CommandeController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,4 +60,6 @@ Route::get('/random-products2', [ProduitController::class, 'getRandomProducts2']
 
 
 Route::post('/register-and-order', [CommandeController::class, 'registerAndCreateOrder']);
+Route::get('/dashboard', [DashboardController::class, 'index']);
+
 
