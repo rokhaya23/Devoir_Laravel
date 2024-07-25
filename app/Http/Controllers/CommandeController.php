@@ -141,27 +141,86 @@ class CommandeController extends Controller
     }
 
     // Update a specific order
-    public function update(Request $request, $id)
-    {
-        $user = auth()->user();
-        $commande = Commande::where('idUser', $user->id)->findOrFail($id);
+    // CommandeController.php
 
-        $validatedData = $request->validate([
-            'products' => 'required|array',
-            'products.*.id' => 'required|exists:produits,id',
-            'products.*.quantity' => 'required|integer|min:1',
-        ]);
+    public function update(Request $request, $orderId)
+{
+    // Validation des données
+    $request->validate([
+        'produits' => 'required|array',
+        'produits.*.id' => 'required|exists:produits,id',
+        'produits.*.pivot.quantity' => 'required|integer|min:1',
+    ]);
 
-        $commande->produits()->sync(
-            collect($validatedData['products'])->mapWithKeys(function ($product) {
-                return [$product['id'] => ['quantity' => $product['quantity']]];
-            })->toArray()
-        );
-
-        $commande->save();
-
-        return response()->json(['message' => 'Order updated successfully', 'order' => $commande]);
+    // Trouver la commande
+    $commande = Commande::find($orderId);
+    if (!$commande) {
+        return response()->json(['error' => 'Commande non trouvée'], 404);
     }
+
+    // Obtenir les produits existants dans la commande pour calculer les changements de stock
+    $existingProducts = $commande->produits->keyBy('id');
+    
+    // Créer une collection pour les nouveaux produits ajoutés
+    $newProducts = collect($request->produits)->keyBy('id');
+    
+    // Traiter les produits existants et les nouveaux produits
+    foreach ($existingProducts as $productId => $existingProduct) {
+        if (isset($newProducts[$productId])) {
+            $newQuantity = $newProducts[$productId]['pivot']['quantity'];
+            $existingQuantity = $existingProduct->pivot->quantity;
+            
+            // Calculer la différence de quantité
+            $quantityDifference = $newQuantity - $existingQuantity;
+
+            // Mettre à jour le produit dans la commande
+            $commande->produits()->updateExistingPivot($productId, [
+                'quantity' => $newQuantity,
+                'totale' => $newQuantity * Produit::find($productId)->prix
+            ]);
+
+            // Ajuster le stock du produit
+            $produit = Produit::find($productId);
+            if ($produit) {
+                $produit->quantite_stock -= $quantityDifference;
+                $produit->save();
+            }
+        } else {
+            // Supprimer le produit qui a été retiré de la commande
+            $quantityToRestore = $existingProduct->pivot->quantity;
+            $produit = Produit::find($productId);
+            if ($produit) {
+                $produit->quantite_stock += $quantityToRestore;
+                $produit->save();
+            }
+            $commande->produits()->detach($productId);
+        }
+    }
+
+    // Ajouter les nouveaux produits qui ne sont pas encore dans la commande
+    foreach ($newProducts as $productId => $product) {
+        if (!isset($existingProducts[$productId])) {
+            $newQuantity = $product['pivot']['quantity'];
+            
+            // Ajouter le produit à la commande
+            $commande->produits()->attach($productId, [
+                'quantity' => $newQuantity,
+                'totale' => $newQuantity * Produit::find($productId)->prix
+            ]);
+            
+            // Ajuster le stock du produit
+            $produit = Produit::find($productId);
+            if ($produit) {
+                $produit->quantite_stock -= $newQuantity;
+                $produit->save();
+            }
+        }
+    }
+
+    return response()->json(['success' => 'Commande mise à jour avec succès'], 200);
+}
+  
+
 
     public function fetchValidatedOrders()
 {
@@ -194,6 +253,32 @@ public function updateOrderStatus(Request $request, $id)
     $order->save();
 
     return response()->json($order);
+}
+public function removeProductFromOrder($orderId, $productId)
+{
+    // Trouver la commande
+    $commande = Commande::find($orderId);
+    if (!$commande) {
+        return response()->json(['error' => 'Commande non trouvée'], 404);
+    }
+
+    // Trouver le produit dans la commande
+    $pivot = $commande->produits()->wherePivot('idProduct', $productId)->first();
+    if (!$pivot) {
+        return response()->json(['error' => 'Produit non trouvé dans la commande'], 404);
+    }
+
+    // Restaurer le stock du produit
+    $produit = Produit::find($productId);
+    if ($produit) {
+        $produit->quantite_stock += $pivot->pivot->quantity;
+        $produit->save();
+    }
+
+    // Supprimer le produit de la commande
+    $commande->produits()->detach($productId);
+
+    return response()->json(['success' => 'Produit supprimé avec succès'], 200);
 }
 
 

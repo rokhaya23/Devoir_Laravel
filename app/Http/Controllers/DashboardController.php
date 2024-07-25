@@ -18,7 +18,8 @@ class DashboardController extends Controller
         $inStock = Produit::where('quantite_stock', '>', 0)->count();
         $outOfStock = Produit::where('quantite_stock', 0)->count();
         $userCount = Utilisateur::count();
-        $confirmedOrdersCount = Commande::where('status', 'Delivered')->count();
+        $deliveredOrdersCount = Commande::where('status', 'Delivered')->count();
+        $pendingOrdersCount = Commande::where('status', 'Pending')->count();
         $totalRevenue = DB::table('pivot_commandes')
             ->join('commandes', 'pivot_commandes.idCommande', '=', 'commandes.id')
             ->where('commandes.status', 'Delivered')
@@ -29,7 +30,8 @@ class DashboardController extends Controller
             'inStock' => $inStock,
             'outOfStock' => $outOfStock,
             'userCount' => $userCount,
-            'confirmedOrdersCount' => $confirmedOrdersCount,
+            'deliveredOrdersCount' => $deliveredOrdersCount,
+            'pendingOrdersCount' => $pendingOrdersCount,
             'totalRevenue' => $totalRevenue
         ]);
     }

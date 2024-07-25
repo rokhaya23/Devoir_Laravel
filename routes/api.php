@@ -46,9 +46,12 @@ Route::middleware(['auth:sanctum',EShopMiddleware::class])->group(function () {
     Route::post('/commandes', [CommandeController::class, 'createOrder']);
     Route::get('/commandes/{id}', [CommandeController::class, 'show']);
     Route::put('/commandes/{id}', [CommandeController::class, 'update']);
-    Route::delete('/commandes/{id}', [CommandeController::class, 'destroy']);
     Route::get('/commandes-validated', [CommandeController::class, 'fetchValidatedOrders']);
     Route::put('/commande/{id}', [CommandeController::class, 'updateOrderStatus']);
+    // routes/api.php
+
+    Route::delete('commandes/{orderId}/produits/{productId}', [CommandeController::class, 'removeProductFromOrder']);
+
 
 });
 
@@ -57,9 +60,10 @@ Route::get('/produits/{produit}', [ProduitController::class, 'show']);
 Route::get('/produits/related', [ProduitController::class, 'related']);
 Route::get('/random-products1', [ProduitController::class, 'getRandomProducts1']);
 Route::get('/random-products2', [ProduitController::class, 'getRandomProducts2']);
+Route::get('/dashboard', [DashboardController::class, 'index']);
+Route::get('products/{id}/stock', [ProduitController::class, 'checkStock']);
 
 
 Route::post('/register-and-order', [CommandeController::class, 'registerAndCreateOrder']);
-Route::get('/dashboard', [DashboardController::class, 'index']);
 
 

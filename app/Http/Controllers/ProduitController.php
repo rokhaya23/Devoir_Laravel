@@ -12,13 +12,9 @@ use Illuminate\Support\Facades\Storage;
 
 class ProduitController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:sanctum', ['except' => ['index', 'show']]);
-    // }
 
     public function index(Request $request)
-{
+    {
     try {
         // Set the number of items per page
         $limit = $request->get('limit', 9); // Default to 10 items per page
@@ -121,4 +117,17 @@ class ProduitController extends Controller
         $products = Produit::inRandomOrder()->limit(4)->get();
         return response()->json($products);
     }
+
+    public function checkStock($id)
+    {
+    $product = Produit::find($id);
+    if ($product) {
+        return response()->json(['quantite_stock' => $product->quantite_stock, 'nom' => $product->nom]);
+    }
+    return response()->json(['error' => 'Product not found'], 404);
+    }
+
+    
+
+
 }
